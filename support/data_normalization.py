@@ -1,6 +1,13 @@
 import pandas as pd
 
+'''
+# 接口2.3 normalize
+# 数据预处理函数（normalize），小数定标法辅助函数（find_tens）
+# made by 张晋豪, 2018.12.18
+'''
 
+
+# method参数不同取值
 # 0 min-max
 # 1 z-score
 # 2 小数定标
@@ -39,9 +46,8 @@ def find_tens(Number):
         if (number / (10 ** i) < 1):
             return i
 
-
 if __name__ == '__main__':
-    file = pd.read_table('bank.csv', ';')
+    file = pd.read_table('test-data/bank.csv', ';')
     trainData = file.iloc[0:4000][
         ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
     print(normalize(trainData, 2))

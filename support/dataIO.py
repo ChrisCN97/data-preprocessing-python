@@ -1,4 +1,5 @@
 """
+# 接口1.1、1.2、1.4
 # 读取文件，预览文件，选择属性列，判断类型，保存文件
 # made by 崔楠，2018.12.17
 """
@@ -6,7 +7,7 @@
 import pandas as pd
 
 # 读取文件
-def readFile(openPath):
+def read_file(openPath):
     try:
         data = pd.read_csv(openPath)
     except FileNotFoundError:
@@ -20,7 +21,7 @@ def readFile(openPath):
         return data
 
 # 文件预览信息
-def fileSkim(data):
+def file_skim(data):
     skimInfo = data.head(3).to_string()
     skimInfo += "\n...... ......\n"
     skimInfo += "\n".join(data.tail(3).to_string().split("\n")[1:])
@@ -28,7 +29,7 @@ def fileSkim(data):
     return skimInfo, props
 
 # 选择属性列，判断数据类型
-def chooseProperty(data, property):
+def choose_property(data, property):
     if str(data[property].dtype) == "object":
         return "文本"
     else:

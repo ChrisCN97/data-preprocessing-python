@@ -1,7 +1,14 @@
 import pandas as pd
 import numpy as np
 
+'''
+接口2.2 noise_process
+# 数据噪声处理（平均值去噪、边界值去噪、中值去噪）
+# made by 张晋豪, 2018.12.18
+'''
 
+
+# 去噪处理函数（noise_process），method参数不同取值
 # 0：平均值
 # 1：边界值
 # 2：中值
@@ -114,7 +121,6 @@ def noise_process(data, method):
 
     normal_df = pd.DataFrame(array_copy, index=range(row), columns=list)
     return normal_df
-
 
 # if __name__ == '__main__':
 #     file = pd.read_table('bank.csv', ';')
