@@ -1,3 +1,5 @@
+# author: god Piao
+
 import numpy as np
 import operator
 import math
@@ -61,7 +63,7 @@ def drawBar(label, data):
         height = rect.get_height()
         plt.text(rect.get_x() + rect.get_width() / 2, height, str(height), ha='center', va='bottom')
     plt.savefig('test.png', dpi=600)
-    # plt.show()
+    plt.show()
 
 
 def draw_bar(label, data):
@@ -125,9 +127,9 @@ def drawLine(label, data):
     x = range(len(data))
     ax1.plot(x, data)
     plt.savefig('test.png', dpi=600)
-    #plt.show()
+    plt.show()
 
 
-filename = 'C:/Users/14124/Documents/Tencent Files/1412452881/FileRecv/bank.txt'
+filename = 'bank.csv'
 label, data = loadDataSet(filename, 1)
 drawLine(label, data)

@@ -40,8 +40,8 @@ def find_tens(Number):
             return i
 
 
-# if __name__ == '__main__':
-#     file = pd.read_table('bank.csv', ';')
-#     trainData = file.iloc[0:4000][
-#         ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
-#     print(normalize(trainData, 2))
+if __name__ == '__main__':
+    file = pd.read_table('bank.csv', ';')
+    trainData = file.iloc[0:4000][
+        ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
+    print(normalize(trainData, 2))
