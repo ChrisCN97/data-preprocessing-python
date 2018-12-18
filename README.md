@@ -25,5 +25,8 @@
 * 折线图
 * 饼图
 
-## null_processing.py
+### null_processing.py
 空缺值处理
+* 均值
+* 均值-方差
+* 正态随机
