@@ -10,15 +10,10 @@ import pandas as pd
 def read_file(openPath):
     try:
         data = pd.read_csv(openPath)
-    except FileNotFoundError:
-        print("文件不存在！")
-        return False
-    except:
-        print("未知错误！")
-        return False
-    else:
-        print("文件加载成功！")
         return data
+    except Exception as e:
+        print(e)
+        return False
 
 # 文件预览信息
 def file_skim(data):

@@ -1,3 +1,6 @@
+'''
+系统功能包
+'''
 
 from .dataIO import read_file, file_skim, choose_property, save
 from .null_processing import null_process

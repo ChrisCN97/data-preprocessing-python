@@ -1,0 +1,31 @@
+
+.content-center {
+    text-align: center;
+}
+
+ .special-button {
+    z-index: 1000;
+    box-shadow: 0px 0px 3px rgb(100, 120, 240);
+    background-color: rgba(100, 120, 240, 0.8);
+    position: fixed;
+    right: 10px;
+    color: white;
+}
+.special-button:nth-of-type(1) {
+    bottom: 50px;
+}
+.special-button:nth-of-type(2) {
+    bottom: 8px;
+}
+
+#data-preview {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0px auto 20px;
+    padding: 5px;
+    max-height: 200px;
+    outline: none;
+    border: 1px solid gray;
+    border-radius: 10px;
+}
