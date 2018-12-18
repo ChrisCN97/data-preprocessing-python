@@ -121,10 +121,3 @@ def noise_process(data, method):
 
     normal_df = pd.DataFrame(array_copy, index=range(row), columns=list)
     return normal_df
-
-# if __name__ == '__main__':
-#     file = pd.read_table('bank.csv', ';')
-#     trainData = file.iloc[0:4000][
-#         ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
-#     df = noise_process(trainData, 2)
-#     print(df)

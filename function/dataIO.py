@@ -1,5 +1,5 @@
 """
-# 接口1.1、1.2、1.4
+# 接口1.1、1.2、1.3、1.4
 # 读取文件，预览文件，选择属性列，判断类型，保存文件
 # made by 崔楠，2018.12.17
 """
@@ -36,7 +36,7 @@ def choose_property(data, property):
         return "数值"
 
 # 保存文件
-def sava(data, savaPath):
+def save(data, savaPath):
     try:
         data.to_csv(savaPath)
     except:

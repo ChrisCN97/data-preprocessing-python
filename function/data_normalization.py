@@ -45,9 +45,3 @@ def find_tens(Number):
     for i in range(-10, 11):
         if (number / (10 ** i) < 1):
             return i
-
-if __name__ == '__main__':
-    file = pd.read_table('test-data/bank.csv', ';')
-    trainData = file.iloc[0:4000][
-        ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
-    print(normalize(trainData, 2))

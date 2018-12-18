@@ -29,7 +29,7 @@ def _normal_process(series):
 _operations = {0: _mean_process, 1: _var_process, 2: _normal_process}
 
 
-def nullProcess(data, method):
+def null_process(data, method):
     op = _operations[method]
     data = data.copy(True)
     columns = data.columns
@@ -41,10 +41,3 @@ def nullProcess(data, method):
             data[col].fillna(method='ffill', inplace=True)
 
     return data
-
-
-if __name__ == "__main__":
-    data = pd.read_csv('./test.csv')
-    method = 2
-    data = nullProcess(data, method)
-    print(data)

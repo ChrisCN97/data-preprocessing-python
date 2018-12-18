@@ -1,4 +1,7 @@
-# author: god Piao
+'''
+# 接口 4.1、4.2、4.3
+# author: 蒲治北
+'''
 
 import numpy as np
 import operator
@@ -23,33 +26,17 @@ def is_number(s):
     return False
 
 
-def loadDataSet(fileName, n):
-    data = []
-    fr = open(fileName)
-    first_line = fr.readline()
-    label_line = first_line.strip().split(';')
-    labels = list(label_line)
-    label = eval(labels[n - 1])
-    for line in fr.readlines():
-        curLine = line.strip().split(';')
-        fltLine = list(curLine)
-        data.append(eval(fltLine[n-1]))
-    return label, data
-
-
 def drawHist(label, data):
-    fig = plt.figure(1)
     ax1 = plt.subplot(111)
     data1 = np.array(data)
     ax1.hist(data1, bins=int((max(data)-min(data))/10), density=0, histtype='stepfilled')
     plt.xticks(rotation=300)
     plt.xlabel(label)
     plt.ylabel('Frequency')
-    plt.show()
+    return plt
 
 
 def drawBar(label, data):
-    fig = plt.figure(1)
     ax1 = plt.subplot(111)
     xticks = {}
     for attrValue in data:
@@ -62,19 +49,16 @@ def drawBar(label, data):
     for rect in rects:
         height = rect.get_height()
         plt.text(rect.get_x() + rect.get_width() / 2, height, str(height), ha='center', va='bottom')
-    plt.savefig('test.png', dpi=600)
-    plt.show()
-
+    return plt
 
 def draw_bar(label, data):
     if is_number(data[0]):
-        drawHist(label, data)
+        return drawHist(label, data)
     else:
-        drawBar(label, data)
+        return drawBar(label, data)
 
 
-def drawPie(label, data):
-    fig = plt.figure(1)
+def draw_pie(label, data):
     ax1 = plt.subplot(111)
     xticks = {}
     labels = []
@@ -116,20 +100,12 @@ def drawPie(label, data):
         labels = list(xticks.keys())
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', pctdistance=0.8, shadow=False, labeldistance=1.1, startangle=90)
     plt.xlabel(label)
-    plt.savefig('test.png', dpi=600)
-    # plt.show()
+    return plt
 
 
-def drawLine(label, data):
-    fig = plt.figure(1)
+def draw_line(label, data):
     ax1 = plt.subplot(111)
     data.sort()
     x = range(len(data))
     ax1.plot(x, data)
-    plt.savefig('test.png', dpi=600)
-    plt.show()
-
-
-filename = 'bank.csv'
-label, data = loadDataSet(filename, 1)
-drawLine(label, data)
+    return plt
