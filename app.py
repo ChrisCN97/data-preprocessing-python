@@ -48,6 +48,7 @@ def open_path(p):
 # 实测通过
 @eel.expose
 def get_data(p):
+	global data
 	with open(p, 'rb') as f:
 		reader = pd.read_csv(f, iterator=True)
 		chunks = []
