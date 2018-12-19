@@ -55,5 +55,5 @@ $('#visual-pie').click(() => {
     eel.draw_pie()
 })
 
-data = eel.get_data()
-$('#data-preview').value(data)
+// data = eel.get_data()
+// $('#data-preview').value(data)

@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="img/icon.png" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/file-tree.css">
     <link rel="stylesheet" href="css/index.css">
     <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -26,10 +27,10 @@
     </div>
 </div>
 
-<button id="btn-open" class="btn btn-default special-button" type="button">open</button>
+<button id="btn-open" class="btn btn-default special-button" data-toggle="modal" data-target="#file-explorer">open</button>
 <button id="btn-save" class="btn btn-default special-button" type="button">save</button>
 
-<div class="container">
+<div id="main-container" class="container">
 
     <!-- 显示输入数据路径 -->
     <div class="panel panel-default" style="padding: 5px;">
@@ -42,6 +43,7 @@
     <!-- 数据预览 -->
     <input id="data-preview" placeholder="数据预览" />
     
+    <!-- 功能按键 -->
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="container">
@@ -135,9 +137,30 @@
         </div>
     </div>
 
+    <!-- 文件浏览器 -->
+    <div class="modal fade" id="file-explorer" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">文件浏览</h4>
+                </div>
+                <div id="ft-container" class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary">选择文件</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
+<script src="js/ft.js"></script>
 <script src="js/index.js"></script>
+<script>
+    $('#ft-container').html(ftRender(data))
+    $('#btn-open').click()
+</script>
 
 </body>
 </html>
