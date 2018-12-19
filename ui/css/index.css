@@ -18,14 +18,24 @@
     bottom: 8px;
 }
 
+#btn-refresh {
+    position: absolute;
+    right: -30px; top: 0px;
+    width: 30px; height: 30px;
+    transform: rotate(0deg);
+    border: 1px solid rgb(200, 200, 200);
+    border-left: none;
+    border-radius: 0px 5px 5px 0px;
+    background-image: url('../img/refresh.png');
+    background-size: cover;
+    cursor: pointer;
+}
+
 #data-preview {
-    display: block;
-    box-sizing: border-box;
     width: 100%;
-    margin: 0px auto 20px;
-    padding: 5px;
+    margin: 0px;
+    min-height: 30px;
     max-height: 200px;
     outline: none;
-    border: 1px solid gray;
-    border-radius: 10px;
+    border: none;
 }

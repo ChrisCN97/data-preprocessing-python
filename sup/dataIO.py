@@ -9,7 +9,7 @@ import pandas as pd
 # 读取文件
 def read_file(openPath):
     try:
-        data = pd.read_csv(openPath)
+        data = pd.read_csv(openPath, encoding='utf-8')
         return data
     except Exception as e:
         print(e)

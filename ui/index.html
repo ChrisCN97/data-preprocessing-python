@@ -1,14 +1,12 @@
 <html>
 <head>
     <title>DPTools</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="img/icon.png" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/file-tree.css">
     <link rel="stylesheet" href="css/index.css">
-    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/eel.js"></script>
 </head>
 <body>
 
@@ -36,12 +34,15 @@
     <div class="panel panel-default" style="padding: 5px;">
         <div>
             <span class="label label-info">输入文件</span>
-            <span id="input-name"></span>
+            <span id="main-input-path"></span>
         </div>
     </div>
 
     <!-- 数据预览 -->
-    <input id="data-preview" placeholder="数据预览" />
+    <div class="panel panel-default" style="position: relative;">
+        <div id="btn-refresh" data-toggle="tooltip" data-placement="bottom" title="刷新数据预览"></div>
+        <pre id="data-preview" placeholder="数据预览"></pre>
+    </div>
     
     <!-- 功能按键 -->
     <div class="panel panel-default">
@@ -138,16 +139,25 @@
     </div>
 
     <!-- 文件浏览器 -->
-    <div class="modal fade" id="file-explorer" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div id="file-explorer" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="myModalLabel">文件浏览</h4>
                 </div>
-                <div id="ft-container" class="modal-body"></div>
+                <div id="ft-container" class="modal-body">
+                    <div class="panel panel-default" style="padding: 5px;">
+                        <div>
+                            <span class="label label-info">输入文件</span>
+                            <span id="ft-input-path"></span>
+                        </div>
+                    </div>
+                    <!-- ft 元素将通过 js 加入 dom -->
+                </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary">选择文件</button>
+                    <button id="btn-ft-backup" class="btn btn-default" type="button">后退</button>
+                    <button id="btn-ft-confirm" type="button" class="btn btn-primary">选择文件</button>
                 </div>
             </div>
         </div>
@@ -155,11 +165,113 @@
 
 </div>
 
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="/eel.js"></script>
+<script src="js/util.js"></script>
 <script src="js/ft.js"></script>
 <script src="js/index.js"></script>
 <script>
-    $('#ft-container').html(ftRender(data))
+    const path_seperator = detectOS().startsWith('Win') ? '\\' : '/'
+    const preview_data = (data) => {
+        $('#data-preview').text(data)
+    }
+
+    let ft_input_path = $('#ft-input-path')
+    let main_input_path = $('#main-input-path')
+
+    /* file tree */
+    let file_explorer = $('#file-explorer')
+
+    let ft = new FileTree((path, resolveView) => {
+        eel.open_path(path)((data) => resolveView(JSON.parse(data)))
+    }, (path) => {
+        ft_input_path.text(path)
+    })
+
+    // 初始化文件浏览器，使用工作目录作为文件树根节点
+    eel.get_cwd()((cwd) => {
+        $('#ft-container').append(ft.render({ name: cwd, type: 'dir'}))
+    })
+
+    $('#btn-ft-backup').click(() => ft.load_parent())
+
+    // 选择文件按钮，绑定 click 事件
+    $('#btn-ft-confirm').click(() => {
+        let path = ft_input_path.text()
+        if (path) {
+            main_input_path.text(path)
+            file_explorer.modal('toggle')
+            eel.get_data(path)((data) => preview_data(JSON.parse(data).data))
+        }
+        else alert('请选择一个数据文件')
+    })
+
+    /* data preview */
+
+    let btn_refresh = $('#btn-refresh')
+    btn_refresh.tooltip()
+    btn_refresh.click(() => {})
+
     $('#btn-open').click()
+
+    /* other */
+    
+    // 空缺值处理
+
+    $('#null-process-mean').click(() => {
+        eel.null_process(0)((data) => preview_data(JSON.parse(data).data))
+    })
+
+    $('#null-process-var').click(() => {
+        eel.null_process(1)
+    })
+
+    $('#null-process-normal').click(() => {
+        eel.null_process(2)
+    })
+
+    // 噪音处理
+
+    $('#noise-process-avg').click(() => {
+        eel.noise_process(0)
+    })
+
+    $('#noise-process-border').click(() => {
+        eel.noise_process(1)
+    })
+
+    $('#noise-process-mid').click(() => {
+        eel.noise_process(2)
+    })
+
+    // 数据规范化
+
+    $('#normalize-min-max').click(() => {
+        eel.normalize(0)((data) => preview_data(JSON.parse(data).data))
+    })
+
+    $('#normalize-z-score').click(() => {
+        eel.normalize(1)
+    })
+
+    $('#normalize-calibrating').click(() => {
+        eel.normalize(2)
+    })
+
+    // 数据可视化
+
+    $('#visual-bar').click(() => {
+        eel.draw_bar()
+    })
+
+    $('#visual-line').click(() => {
+        eel.draw_line()
+    })
+
+    $('#visual-pie').click(() => {
+        eel.draw_pie()
+    })
 </script>
 
 </body>
