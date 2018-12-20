@@ -26,7 +26,7 @@ def normalize(data, method):
     elif method == 1:  # z-score
         for i in range(col):
             mean = array[:, i].mean()
-            std = array[:, i].std()
+            std = array[:, i].std()  # 标准差
             array[:, i] = (array[:, i] - mean) / std
 
     elif method == 2:  # 小数定标
@@ -40,8 +40,15 @@ def normalize(data, method):
     return normal_df
 
 
+# 需要一个10的x次方，使其刚好大于Number值，返回x
 def find_tens(Number):
     number = abs(Number)
     for i in range(-10, 11):
         if (number / (10 ** i) < 1):
             return i
+
+# if __name__ == '__main__':
+#     file = pd.read_table('bank.csv', ';')
+#     trainData = file.iloc[0:4000][
+#         ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
+#     print(normalize(trainData, 2))

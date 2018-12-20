@@ -22,22 +22,26 @@ const wrapcall = (consumer) => {
             consumer(data.data, data.ext)
         }
         else {
-            notify('danger', data.desc || 'unknown error occured')
+            notify('danger', data.desc || 'unknown error occured', hasClose = true, align_center=false)
         }
     }
 }
 // 通知
-const notify = (type, msg, hasClose=false, duration=2000) => {
-    let close = hasClose ? `<a href="#" class="close" data-dismiss="alert">&times;</a>` : '';
+const notify = (type, msg, hasClose=false, align_center=true) => {
     let notify = $(`
-        <div class="align-center alert alert-` + type + `">`
-            + close + `
-            <strong>` + msg + `</strong>
+        <div class="alert alert-` + type + `">
+            <p style="display: block; width: 100%; white-space: pre; word-break: break-all;">` + msg + `</p>
         </div>`)
-    $('#main-container').append(notify)
-    if (!hasClose) {
-        setTimeout(() => notify.remove(), duration)
+    if (align_center) {
+        notify.addClass('align-center')
     }
+    if (hasClose) {
+        notify.prepend(`<a href="#" class="close" data-dismiss="alert">&times;</a>`)
+    }
+    else {
+        setTimeout(() => notify.remove(), 2000)
+    } 
+    $('#notify-box').append(notify)
 }
 // 输出数据到数据预览块
 const preview_data = (col_keys, row_keys, at) => {
@@ -110,11 +114,11 @@ const display_as_modal = () => {
 }
 // 添加图片到历史视图
 const display_image = (b64_data, mid) => {
-    let div = $(`<div class="col-sm-6 col-md-3"><a class="thumbnail"></a></div>`)
+    let div = $(`<div class="col-sm-6 col-md-3 align-center"><div class="thumbnail"></div></div>`)
     let img = document.createElement('img')
     img.mid = mid
     img.src = 'data:image/png;base64,' + b64_data
-    div.find('a').append(img)
+    div.find('div').append(img).append(`<span>` + mid + `</span>`)
 
     let c = $('#thumbnail-container')
     let rows = c.find('.row'), row = null, index = 0
@@ -176,7 +180,7 @@ $('#btn-ft-confirm').click(() => {
             }
         ))
     }
-    else alert('请选择一个数据文件')
+    else notify('warning', '请选择一个数据文件')
 })
 
 /* 属性选择器 */
@@ -269,7 +273,7 @@ $('#btn-id-close').click(() => image_display.hide())
 
 $('#btn-save').click(() => {
     eel.save_data()(wrapcall(
-        (output_path) => notify('success', 'output to: ' + output_path)
+        (output_dir) => notify('success', 'output to: ' + output_dir, hasClose=true)
     ))
 })
 

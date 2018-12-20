@@ -8,7 +8,7 @@ import numpy as np
 '''
 
 
-# 去噪处理函数（noise_process），method参数不同取值
+# 去噪处理函数（noise_process），data为输入的原始dataframe, method参数不同取值
 # 0：平均值
 # 1：边界值
 # 2：中值
@@ -18,106 +18,82 @@ def noise_process(data, method):
     list = data.columns.values.tolist()  # 属性列表
     array = np.array(data.values)  # numpy数组
 
+    array_copy = array.copy()  # 获取输入dataframe的原始备份，用作中间计算处理
+    array_copy2 = array.copy()  # 获取输入dataframe的原始备份，用作结果返回矩阵
+    array_rank = np.array(np.zeros(row * col)).reshape(row, col)  # 按列排序后到排序前的映射
+    array2rank = np.array(np.zeros(row * col)).reshape(row, col)  # 按列排序前到排序后的映射
+    for i in range(col):
+        array_rank[:] = array_copy.argsort(0)  # 排序后的数组该位置对应原始数组的位置
+        array.sort(0)  # 按列排序
+
+    # array已排序
+    # array_copy为原始数组
+    # array_rank排序后到排序前
+    # array2rank排序前到排序后
+
+    for i in range(row):
+        for j in range(col):
+            # 根据按列排序后的，对应着排序前下标的矩阵rank_rank中值的行坐标
+            # 即对应着原始矩阵位置的矩阵单元
+            # 设置列排序前到排序后的映射的矩阵array_rank2的单元为其横坐标
+            # 由于是按列排序，所以列坐标不变
+            array2rank[int(array_rank[i, j]), j] = i
+
+    # 两个恒等式
+    # 排序后的矩阵[i,j]=原始矩阵[列排序后到排序前的映射[i,j],j]
+    # array[i, j] == array_copy[int(array_rank[i, j]), j] 为真
+    # 原始矩阵[i,j]=排序后的矩阵[列排序前到排序后的映射[i,j],j]
+    # array_copy[i, j] ==  array[int(array2rank[i, j]), j] 为真
+
     if method == 0:  # 0：平均值
-        array_copy = array.copy()
-        array_rank = np.array(np.zeros(row * col)).reshape(row, col)
-        array2rank = np.array(np.zeros(row * col)).reshape(row, col)
-        for i in range(col):
-            array_rank[:] = array_copy.argsort(0)  # 排序后的数组该位置对应原始数组的位置
-            array.sort(0)
-
-        # array已排序
-        # array_copy为原始数组
-        # array_rank排序后到排序前
-        # array2rank排序前到排序后
-
+        # 分箱操作正式开始，以1/10为单位进行分箱
+        count = 0  # 单项计数器
+        k = 0  # 十分之一模块数计数器
         for i in range(row):
+            start = int(k / 10.0 * row)  # 单位起点
+            end = int((k + 1) / 10.0 * row)  # 单位终点
+            List = array_rank[start:end].astype(int)  # 将这一区间内的排序结果转换为int类型
             for j in range(col):
-                array2rank[int(array_rank[i, j]), j] = i
-
-        # array[i, j] == array_copy[int(array_rank[i, j]), j] 为真
-        # array_copy[i, j] ==  array[int(array2rank[i, j]), j] 为真
-
-        count = 0
-        k = 0
-        for i in range(row):
-            start = int(k / 10.0 * row)
-            end = int((k + 1) / 10.0 * row)
-            List = array_rank[start:end].astype(int)
-            for j in range(col):
-                mean = np.sum(array_copy[List, j]) / (1 / 10.0 * row)
-                # array[array2rank[start,i], i] = mean
-                array_copy[int(array_rank[i, j]), j] = mean
+                mean = np.sum(array_copy[List, j]) / (1 / 10.0 * row)  # 计算区间均值
+                array_copy2[int(array_rank[i, j]), j] = mean  # 原始矩阵的备份[排序前对应排序位置]=均值
             count += 1
             if (count % (row / 10) == 0):
                 k += 1
 
-    # up = array_copy2[end, j]
     elif method == 1:  # 1：边界值
-        array_copy = array.copy()
-        array_copy2 = array.copy()
-        array_rank = np.array(np.zeros(row * col)).reshape(row, col)
-        array2rank = np.array(np.zeros(row * col)).reshape(row, col)
-        for i in range(col):
-            array_rank[:] = array_copy.argsort(0)  # 排序后的数组该位置对应原始数组的位置
-            array.sort(0)
-
-        # array已排序
-        # array_copy为原始数组
-        # array_rank排序后到排序前
-        # array2rank排序前到排序后
-
-        for i in range(row):
-            for j in range(col):
-                array2rank[int(array_rank[i, j]), j] = i
-
-        # array[i, j] == array_copy[int(array_rank[i, j]), j] 为真
-        # array_copy[i, j] ==  array[int(array2rank[i, j]), j] 为真
-
-        count = 0
-        k = 0
-        for i in range(row):
-            start = int(k / 10.0 * row)
-            end = int((k + 1) / 10.0 * row) - 1
-            for j in range(col):
-                up = array_copy2[end, j]
-                array_copy[int(array_rank[i, j]), j] = up
+        # 分箱操作正式开始，以1/10为单位进行分箱
+        count = 0  # 单项计数器
+        k = 0  # 十分之一单位计数器
+        for i in range(row):  # 对每一行
+            start = int(k / 10.0 * row)  # 单位起点
+            end = int((k + 1) / 10.0 * row) - 1  # 单位终点
+            for j in range(col):  # 对每一列
+                up = array_copy2[end, j]  # 取排序后的上限
+                array_copy2[int(array_rank[i, j]), j] = up  # 去区间上限降噪
             count += 1
             if (count % (row / 10) == 0):
                 k += 1
 
     elif method == 2:  # 2：中值
-        array_copy = array.copy()
-        array_copy2 = array.copy()
-        array_rank = np.array(np.zeros(row * col)).reshape(row, col)
-        array2rank = np.array(np.zeros(row * col)).reshape(row, col)
-        for i in range(col):
-            array_rank[:] = array_copy.argsort(0)  # 排序后的数组该位置对应原始数组的位置
-            array.sort(0)
-
-        # array已排序
-        # array_copy为原始数组
-        # array_rank排序后到排序前
-        # array2rank排序前到排序后
-
-        for i in range(row):
+        count = 0  # 单项计数器
+        k = 0  # 十分之一累积计数器
+        for i in range(row):  # 每一行
+            start = int(k / 10.0 * row)  # 十分之一起始位置
+            end = int((k + 1) / 10.0 * row) - 1  # 十分之一结束位置
             for j in range(col):
-                array2rank[int(array_rank[i, j]), j] = i
-
-        # array[i, j] == array_copy[int(array_rank[i, j]), j] 为真
-        # array_copy[i, j] ==  array[int(array2rank[i, j]), j] 为真
-
-        count = 0
-        k = 0
-        for i in range(row):
-            start = int(k / 10.0 * row)
-            end = int((k + 1) / 10.0 * row) - 1
-            for j in range(col):
-                Middle = array_copy2[int((start + end) / 2), j]
-                array_copy[int(array_rank[i, j]), j] = Middle
+                Middle = array_copy2[int((start + end) / 2), j]  # 寻找中值
+                array_copy2[int(array_rank[i, j]), j] = Middle  # 用中值降噪
             count += 1
             if (count % (row / 10) == 0):
                 k += 1
 
-    normal_df = pd.DataFrame(array_copy, index=range(row), columns=list)
+    normal_df = pd.DataFrame(array_copy2, index=range(row), columns=list)
     return normal_df
+
+
+# if __name__ == '__main__':
+#     file = pd.read_table('bank.csv', ';')
+#     trainData = file.iloc[0:4000][
+#         ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
+#     df = noise_process(trainData, 2)
+#     print(df)

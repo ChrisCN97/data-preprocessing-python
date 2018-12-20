@@ -226,14 +226,22 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="btn-as-cancel" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button id="btn-as-confirm" type="button" class="btn btn-primary">确认</button>
+                    <!-- <button id="btn-as-cancel" type="button" class="btn btn-default" data-dismiss="modal">取消</button> -->
+                    <button id="btn-as-confirm" type="button" class="btn btn-primary">关闭</button>
                 </div>
             </div>
         </div>
     </div>
 
 </div>
+
+<div id="notify-box" style="
+    position: absolute;
+    top: 20px; right: 20px;
+    min-width: 500px; height: 10px;
+    overflow: visible;
+    z-index: 5000;
+"></div>
 
 <script src="js/lib/jquery-3.3.1.min.js"></script>
 <script src="js/lib/bootstrap.min.js"></script>
