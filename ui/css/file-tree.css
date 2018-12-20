@@ -8,6 +8,13 @@ ft {
     border-left: 1px solid rgb(200, 200, 200);
 }
 
+ft * {
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+
 ft-dir {
     background-image: url('../img/ft-dir.png');
     background-repeat: no-repeat;

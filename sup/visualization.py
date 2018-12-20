@@ -3,15 +3,19 @@
 # author: 蒲治北
 '''
 
-import numpy as np
-import operator
+import io
 import math
+import operator
+import numpy as np
 import matplotlib.pyplot as plt
+from unicodedata import numeric
 
+'''
+loadDataSet(fileName, n)函数加载数据，n代表是用户指定的第n列数据
+draw_bar用于绘制条形图，drawPie绘制饼图，drawLine绘制折线图
+is_number用于判断用户该列数据是否是数字，若是，draw_bar函数调用def drawHist绘制直方图，否则调用drawBar绘制条形图
+'''
 
-# loadDataSet(fileName, n)函数加载数据，n代表是用户指定的第n列数据
-# draw_bar用于绘制条形图，drawPie绘制饼图，drawLine绘制折线图
-# is_number用于判断用户该列数据是否是数字，若是，draw_bar函数调用def drawHist绘制直方图，否则调用drawBar绘制条形图
 def is_number(s):
     try:
         float(s)
@@ -20,30 +24,25 @@ def is_number(s):
         pass
 
     try:
-        import unicodedata
-        unicodedata.numeric(s)
+        numeric(s)
         return True
     except (TypeError, ValueError):
         pass
 
     return False
 
-def loadDataSet(fileName, n):
-    data = []
-    fr = open(fileName)
-    # 第一行是每一列数据的名称，绘图时不需要第一行
-    first_line = fr.readline()
-    label_line = first_line.strip().split(';')
-    labels = list(label_line)
-    # 去掉split时默认加上的引号
-    label = eval(labels[n - 1])
-    for line in fr.readlines():
-        curLine = line.strip().split(';')
-        fltLine = list(curLine)
-        data.append(eval(fltLine[n-1]))
-    return label, data
+def get_bytes(canvas):
+    '''
+    通过 canvas 获取图像二进制流
+    '''
+    buffer = io.BytesIO()
+    canvas.print_png(buffer)
+    data = buffer.getvalue()
+    buffer.close()
+    return data
 
 def drawHist(label, data):
+    fig = plt.figure()
     ax1 = plt.subplot(111)
     data1 = np.array(data)
     ax1.hist(data1, bins=int((max(data)-min(data))/10), density=0, histtype='stepfilled')
@@ -52,10 +51,10 @@ def drawHist(label, data):
     # 横纵轴名称
     plt.xlabel(label)
     plt.ylabel('Frequency')
-    return plt
-
+    return fig.canvas
 
 def drawBar(label, data):
+    fig = plt.figure()
     ax1 = plt.subplot(111)
     xticks = {}
     for attrValue in data:
@@ -71,16 +70,28 @@ def drawBar(label, data):
     for rect in rects:
         height = rect.get_height()
         plt.text(rect.get_x() + rect.get_width() / 2, height, str(height), ha='center', va='bottom')
-    return plt
+    return fig.canvas
+
+# 对外接口
 
 def draw_bar(label, data):
+    '''
+    label: string 属性列名
+    data: list 属性列
+    return: bytes
+    '''
     if is_number(data[0]):
-        return drawHist(label, data)
+        canvas = drawHist(label, data)
     else:
-        return drawBar(label, data)
-
+        canvas = drawBar(label, data)
+    return get_bytes(canvas)
 
 def draw_pie(label, data):
+    '''
+    label: string 属性列名
+    data: list 属性列
+    '''
+    fig = plt.figure()
     ax1 = plt.subplot(111)
     xticks = {}
     labels = []
@@ -88,9 +99,10 @@ def draw_pie(label, data):
     # 如果数据是数字，应该将数据分区间统计然后绘制饼图，否则直接统计每一种数据的数量绘制饼图
     if is_number(data[0]):
         values = []
-        dist = (max(data) - min(data)) / 5
+        min_value = min(data)
+        dist = (max(data) - min_value) / 5 # 计算一个区间的范围
         for i in range(6):
-            values.append(min(data)+dist*i)
+            values.append(min_value + dist * i)
         for i in range(2):
             labels.append(str(int(values[i])) + '-' + str(int(values[i + 1])))
             # 由于数据一般服从正态分布，导致首尾的区间包含个数少，导致饼图中这些区间面积小，文字显示重叠，所以这里没有将区间按大小顺序排序
@@ -99,13 +111,13 @@ def draw_pie(label, data):
         labels.append(str(int(values[3])) + '-' + str(int(values[4])))
         # 统计数据
         for attrValue in data:
-            if min(data) < attrValue < min(data) + dist:
+            if min_value <= attrValue < min_value + dist:
                 xticks[values[0]] = xticks.get(values[0], 0) + 1
-            elif min(data) + dist <= attrValue < min(data) + 2*dist:
+            elif min_value + dist <= attrValue < min_value + 2 * dist:
                 xticks[values[1]] = xticks.get(values[1], 0) + 1
-            elif min(data) + 2*dist <= attrValue < min(data) + 3*dist:
+            elif min_value + 2 * dist <= attrValue < min_value + 3 * dist:
                 xticks[values[2]] = xticks.get(values[2], 0) + 1
-            elif min(data) + 3*dist <= attrValue < min(data) + 4*dist:
+            elif min_value + 3 * dist <= attrValue < min_value + 4 * dist:
                 xticks[values[3]] = xticks.get(values[3], 0) + 1
             else:
                 xticks[values[4]] = xticks.get(values[4], 0) + 1
@@ -128,12 +140,17 @@ def draw_pie(label, data):
         labels = list(xticks.keys())
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', pctdistance=0.8, shadow=False, labeldistance=1.1, startangle=90)
     plt.xlabel(label)
-    return plt
-
+    return get_bytes(fig.canvas)
 
 def draw_line(label, data):
+    '''
+    label: string 属性列名
+    data: list 属性列
+    '''
+    fig = plt.figure()
     ax1 = plt.subplot(111)
-    data.sort()
+    plt.xlabel(label)
+    data = data.sort_values()
     x = range(len(data))
     ax1.plot(x, data)
-    return plt
+    return get_bytes(fig.canvas)
