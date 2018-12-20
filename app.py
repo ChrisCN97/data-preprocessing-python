@@ -36,12 +36,16 @@ class Context(object):
 
 	def new_version(self, op_type):
 		'''
-		op_type: 操作类型
+		op_type: 操作类型，代表本次更新数据使用的操作
+		数据更新后 data_version 自增
 		'''
 		self.op_records.append(op_type)
 		self.data_version += 1
 	
 	def get_data(self):
+		'''
+		返回 data 用于前端预览，如果 data 行数过多会进行裁剪
+		'''
 		if self.data.shape[0] > Context.max_rows:
 			return self.data[0:Context.max_rows].to_json()
 		else:
@@ -51,7 +55,7 @@ class Context(object):
 		'''
 		# type: 图像内容——直方图、折线图、饼图
 		# data: 图像 bytes 数据
-		# return: image ID
+		# return: image ID，格式: data_version.image_count.bar，实例: 1.3.line
 		'''
 		i = str(self.data_version) + '.' + str(self.image_count) + '.' + type
 		self.image_count += 1
@@ -59,6 +63,9 @@ class Context(object):
 		return i
 	
 	def del_image(self, mid):
+		'''
+		删除图像缓存
+		'''
 		if mid in self.images:
 			del self.images[mid]
 			return True
@@ -111,6 +118,9 @@ def del_image(mid):
 # pass
 @eel.expose
 def save_data():
+	'''
+	在输入目录下创建 DPTool-output，存储数据到该目录下
+	'''
 	output_dir = path.join(path.dirname(ctx.data_path), 'DPTool-output')
 	if path.exists(output_dir):
 		shutil.rmtree(output_dir)
@@ -130,6 +140,7 @@ def save_data():
 	# return
 	return result(ResultType.success, data=output_dir)
 
+# 映射 method 参数为操作类型
 null_type = {0: '均值', 1: '均值-方差', 2: '正太随机'}
 noise_type = {0: '平均值', 1: '边界值', 3: '中值'}
 normalize_type = {0: 'min-max', 1: 'z-score', 2: '小数标定'}
