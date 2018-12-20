@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="img/icon.png" type="image/x-icon" />
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/file-tree.css">
     <link rel="stylesheet" href="css/index.css">
 </head>
@@ -25,121 +25,132 @@
     </div>
 </div>
 
-<button id="btn-open" class="btn btn-default special-button" data-toggle="modal" data-target="#file-explorer">open</button>
-<button id="btn-save" class="btn btn-default special-button" type="button">save</button>
-
 <div id="main-container" class="container">
 
+    <a id="btn-open" class="custom-btn" data-toggle="modal" data-target="#file-explorer"></a>
+    <a id="btn-save" class="custom-btn"></a>
+
     <!-- 显示输入数据路径 -->
-    <div class="panel panel-default" style="padding: 5px;">
-        <div>
-            <span class="label label-info">输入文件</span>
-            <span id="main-input-path"></span>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="label label-info">输入信息</span>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <p>
+                <span class="label label-default">路径</span>
+                <span id="main-input-path"></span>
+            </p>
+            <p>
+                <span class="label label-default">数据规模</span>
+                <span id="main-input-size"></span>
+            </p>
         </div>
     </div>
 
     <!-- 数据预览 -->
     <div class="panel panel-default" style="position: relative;">
-        <div id="btn-refresh" data-toggle="tooltip" data-placement="bottom" title="刷新数据预览"></div>
-        <pre id="data-preview" placeholder="数据预览"></pre>
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="label label-info">数据预览</span>
+                <span class="label label-danger" style="background-color: inherit; color: rgb(230, 100, 120); float: right;">注意：最多显示500行数据</span>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <a id="btn-refresh" class="custom-btn" data-toggle="tooltip" data-placement="bottom" title="刷新数据">
+                <span class='backimg'></span>
+            </a>
+            <table id="data-preview" class="table"></table>
+        </div>
     </div>
     
     <!-- 功能按键 -->
     <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="label label-info">操作</span>
+            </h3>
+        </div>
         <div class="panel-body">
-            <div class="container">
-
-                <!-- 筛选 -->
-                <div class="row">
-                    <div class="col-md-6 col-sm-6 col-xs-6 dropdown content-center">
-                        <button type="button" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-                            <h6>选择属性名</h6>
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"></ul>
-                    </div>
-                    
-                    <div class="col-md-6 col-sm-6 col-xs-6 dropdown content-center">
-                        <button type="button" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-                            <h6>属性类型</h6>
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu"></ul>
-                    </div>
-                </div>
-
-                <hr />
-
+            <div class="row">
                 <!-- 空缺值处理 -->
-                <div class="row">
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <h4>空缺值处理</h4>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="null-process-mean" type="button" class="btn btn-info">均值</button>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="null-process-var" type="button" class="btn btn-info">均值-方差</button>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="null-process-normal" type="button" class="btn btn-info">正态随机</button>
-                    </div>
+                <div class="col-md-3 col-sm-3 col-xs-3 dropdown align-center">
+                    <button type="button" class="btn dropdown-toggle" id="dropdown-btn-1" data-toggle="dropdown">
+                        空缺值处理
+                    </button>
+                    <ul class="dropdown-menu align-center" role="menu" aria-labelledby="dropdown-btn-1">
+                        <li role="presentation">
+                            <a id="null-process-mean" role="menuitem">均值</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="null-process-var" role="menuitem">均值-方差</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="null-process-normal" role="menuitem">正态随机</a>
+                        </li>
+                    </ul>
                 </div>
-        
+
                 <!-- 噪声处理 -->
-                <div class="row">
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <h4>噪声处理</h4>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="noise-process-avg" type="button" class="btn btn-info">平均值</button>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="noise-process-border" type="button" class="btn btn-info">边界值</button>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="noise-process-mid" type="button" class="btn btn-info">中值</button>
-                    </div>
+                <div class="col-md-3 col-sm-3 col-xs-3 dropdown align-center">
+                    <button type="button" class="btn dropdown-toggle" id="dropdown-btn-2" data-toggle="dropdown">
+                        噪声处理
+                    </button>
+                    <ul class="dropdown-menu align-center" role="menu" aria-labelledby="dropdown-btn-2">
+                        <li role="presentation">
+                            <a id="noise-process-avg" role="menuitem">平均值</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="noise-process-border" role="menuitem">边界值</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="noise-process-mid" role="menuitem">中值</a>
+                        </li>
+                    </ul>
                 </div>
-        
+
                 <!-- 数据规范化 -->
-                <div class="row">
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <h4>数据规范化</h4>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="normalize-min-max" type="button" class="btn btn-info">min-max</button>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="normalize-z-score" type="button" class="btn btn-info">z-score</button>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="normalize-calibrating" type="button" class="btn btn-info">小数标定</button>
-                    </div>
+                <div class="col-md-3 col-sm-3 col-xs-3 dropdown align-center">
+                    <button type="button" class="btn dropdown-toggle" id="dropdown-btn-3" data-toggle="dropdown">
+                        数据规范化
+                    </button>
+                    <ul class="dropdown-menu align-center" role="menu" aria-labelledby="dropdown-btn-3">
+                        <li role="presentation">
+                            <a id="normalize-min-max" role="menuitem">min-max</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="normalize-z-score" role="menuitem">z-score</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="normalize-calibrating" role="menuitem">小数标定</a>
+                        </li>
+                    </ul>
                 </div>
                 
                 <!-- 数据可视化 -->
-                <div class="row">
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <h4>数据可视化</h4>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="visual-bar" type="button" class="btn btn-info">条形图</button>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="visual-line" type="button" class="btn btn-info">折线图</button>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 dropdown content-center">
-                        <button id="visual-pie" type="button" class="btn btn-info">饼图</button>
-                    </div>
+                <div class="col-md-3 col-sm-3 col-xs-3 dropdown align-center">
+                    <button type="button" class="btn dropdown-toggle" id="dropdown-btn-4" data-toggle="dropdown">
+                        数据可视化
+                    </button>
+                    <ul class="dropdown-menu align-center" role="menu" aria-labelledby="dropdown-btn-4">
+                        <li role="presentation">
+                            <a id="visual-bar" role="menuitem">条形图</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="visual-line" role="menuitem">折线图</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="visual-pie" role="menuitem">饼图</a>
+                        </li>
+                    </ul>
                 </div>
-
             </div>
         </div>
     </div>
 
     <!-- 文件浏览器 -->
-    <div id="file-explorer" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div id="file-explorer" class="modal fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -165,20 +176,74 @@
 
 </div>
 
-<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery-css-transform.js"></script>
 <script src="/eel.js"></script>
 <script src="js/util.js"></script>
 <script src="js/ft.js"></script>
 <script src="js/index.js"></script>
 <script>
-    const path_seperator = detectOS().startsWith('Win') ? '\\' : '/'
-    const preview_data = (data) => {
-        $('#data-preview').text(data)
-    }
-
+    let data_loaded = false // 是否已经有数据被加载
     let ft_input_path = $('#ft-input-path')
     let main_input_path = $('#main-input-path')
+    let main_input_size = $('#main-input-size')
+    let data_preview = $('#data-preview')
+
+    const path_seperator = detectOS().startsWith('Win') ? '\\' : '/'
+    // 通知
+    const notify = (type, msg, hasClose=false, duration=2000) => {
+        let close = hasClose ? `<a href="#" class="close" data-dismiss="alert">&times;</a>` : '';
+        let notify = $(`
+            <div class="align-center alert alert-` + type + `">`
+                + close + `
+                <strong>` + msg + `</strong>
+            </div>`)
+        $('#main-container').append(notify)
+        if (!hasClose) {
+            setTimeout(() => notify.remove(), duration)
+        }
+    }
+    // 输出数据到数据预览块
+    const preview_data = (col_keys, row_keys, at) => {
+        let col_num = col_keys.length, row_num = row_keys.length
+        if (row_num > 500)
+            row_num = 500
+        // 清空预览
+        data_preview.html('')
+        // 生成 thead
+        let thead = $('<thead></thead>')
+        let thead_tr = $('<tr></tr>')
+        thead_tr.append('<th></th>')
+        for (let item of col_keys) {
+            thead_tr.append(`<th>` + item + `</th>`)
+        }
+        thead.append(thead_tr)
+        data_preview.append(thead)
+        // 生成 tbody
+        let tbody = $('<tbody></tbody>')
+        for (let r = 0; r < row_num; r++) {
+            let tbody_tr = $('<tr></tr>')
+            tbody_tr.append(`<td>` + row_keys[r] + `</td>`)
+            for (let c = 0; c < col_num; c++) {
+                tbody_tr.append(`<td>` + at(c, r) + `</td>`)
+            }
+            tbody.append(tbody_tr)
+        }
+        data_preview.append(tbody)
+    }
+    // 输出数据规模，并调用 preview_data
+    const load_data = (data) => {
+        data = JSON.parse(data)
+        let col_keys, row_keys
+        const at = (c, r) => data[col_keys[c]][row_keys[r]]
+        col_keys = Object.keys(data)
+        if (col_keys.length) {
+            row_keys = Object.keys(data[col_keys[0]])
+            preview_data(col_keys, row_keys, at)
+            main_input_size.text(row_keys.length + '行 * ' + col_keys.length + '列')
+        }
+    }
 
     /* file tree */
     let file_explorer = $('#file-explorer')
@@ -194,6 +259,7 @@
         $('#ft-container').append(ft.render({ name: cwd, type: 'dir'}))
     })
 
+    // 后退按钮，读取父目录
     $('#btn-ft-backup').click(() => ft.load_parent())
 
     // 选择文件按钮，绑定 click 事件
@@ -202,7 +268,11 @@
         if (path) {
             main_input_path.text(path)
             file_explorer.modal('toggle')
-            eel.get_data(path)((data) => preview_data(JSON.parse(data).data))
+            eel.get_data(path)((data) => {
+                load_data(data)
+                notify('success', '数据加载成功')
+                data_loaded = true
+            })
         }
         else alert('请选择一个数据文件')
     })
@@ -211,53 +281,57 @@
 
     let btn_refresh = $('#btn-refresh')
     btn_refresh.tooltip()
-    btn_refresh.click(() => {})
-
-    $('#btn-open').click()
+    btn_refresh.click(() => {
+        let path = main_input_path.text()
+        if (path) {
+            if (!btn_refresh.refreshing) {
+                btn_refresh.refreshing = true
+                eel.get_data(path)((data) => {
+                    load_data(data)
+                    btn_refresh.refreshing = false
+                    notify('success', '刷新成功')
+                })
+            }
+            else notify('warning', '请勿频繁刷新')
+        }
+        else notify('warning', '没有选择数据文件')
+    })
 
     /* other */
+
+    $('#btn-save').click(() => {
+        eel.save_data()((data) => {
+            notify('success', 'output to: ' + JSON.parse(data)['output-path'])
+        })
+    })
+
+    const call_eel = (name, method) => {
+        if (data_loaded) {
+            eel[name](method)((data) => {
+                load_data(data)
+                notify('success', name + ' 成功')
+            })
+        }
+        else notify('warning', '无数据')
+    }
     
     // 空缺值处理
 
-    $('#null-process-mean').click(() => {
-        eel.null_process(0)((data) => preview_data(JSON.parse(data).data))
-    })
-
-    $('#null-process-var').click(() => {
-        eel.null_process(1)
-    })
-
-    $('#null-process-normal').click(() => {
-        eel.null_process(2)
-    })
+    $('#null-process-mean').click(() => call_eel('null_process', 0))
+    $('#null-process-var').click(() => call_eel('null_process', 1))
+    $('#null-process-normal').click(() => call_eel('null_process', 2))
 
     // 噪音处理
 
-    $('#noise-process-avg').click(() => {
-        eel.noise_process(0)
-    })
-
-    $('#noise-process-border').click(() => {
-        eel.noise_process(1)
-    })
-
-    $('#noise-process-mid').click(() => {
-        eel.noise_process(2)
-    })
+    $('#noise-process-avg').click(() => call_eel('noise_process', 0))
+    $('#noise-process-border').click(() => call_eel('noise_process', 1))
+    $('#noise-process-mid').click(() => call_eel('noise_process', 2))
 
     // 数据规范化
 
-    $('#normalize-min-max').click(() => {
-        eel.normalize(0)((data) => preview_data(JSON.parse(data).data))
-    })
-
-    $('#normalize-z-score').click(() => {
-        eel.normalize(1)
-    })
-
-    $('#normalize-calibrating').click(() => {
-        eel.normalize(2)
-    })
+    $('#normalize-min-max').click(() => call_eel('normalize', 0))
+    $('#normalize-z-score').click(() => call_eel('normalize', 1))
+    $('#normalize-calibrating').click(() => call_eel('normalize', 2))
 
     // 数据可视化
 
@@ -272,6 +346,7 @@
     $('#visual-pie').click(() => {
         eel.draw_pie()
     })
+
 </script>
 
 </body>

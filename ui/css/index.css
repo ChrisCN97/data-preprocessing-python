@@ -1,41 +1,66 @@
 
-.content-center {
+.align-center {
     text-align: center;
 }
 
- .special-button {
-    z-index: 1000;
-    box-shadow: 0px 0px 3px rgb(100, 120, 240);
-    background-color: rgba(100, 120, 240, 0.8);
-    position: fixed;
-    right: 10px;
-    color: white;
-}
-.special-button:nth-of-type(1) {
-    bottom: 50px;
-}
-.special-button:nth-of-type(2) {
-    bottom: 8px;
-}
-
-#btn-refresh {
+.custom-btn {
+    display: block;
     position: absolute;
-    right: -30px; top: 0px;
     width: 30px; height: 30px;
     transform: rotate(0deg);
     border: 1px solid rgb(200, 200, 200);
-    border-left: none;
-    border-radius: 0px 5px 5px 0px;
-    background-image: url('../img/refresh.png');
+    border-radius: 5px;
+    box-shadow: 0px 0px 3px black;
     background-size: cover;
     cursor: pointer;
+    z-index: 1000;
+}
+
+.custom-btn:hover {
+    background-color: rgb(220, 220, 220);
+}
+
+#btn-open {
+    position: fixed;
+    right: 50px; bottom: 10px;
+    background-image: url('../img/open.png');
+}
+
+#btn-save {
+    position: fixed;
+    right: 10px; bottom: 10px;
+    background-image: url('../img/save.png');
+}
+
+#btn-refresh {
+    right: -30px; top: 40px;
+    border: 1px solid rgb(200, 200, 200);
+    border-radius: 0px 5px 5px 0px;
+    border-left: none;
+    box-shadow: none;
+}
+
+#btn-refresh .backimg {
+    display: block;
+    position: absolute;
+    left: 0px; top: 0px;
+    width: 100%; height: 100%;
+    transform: rotate(0deg);
+    background-image: url('../img/refresh.png');
+    background-size: cover;
 }
 
 #data-preview {
-    width: 100%;
-    margin: 0px;
-    min-height: 30px;
-    max-height: 200px;
+    display: block;
     outline: none;
     border: none;
+    margin: 0px;
+    width: 100% !important;
+    min-height: 30px !important;
+    max-height: 200px !important;
+    overflow: scroll;
+}
+
+th, td {
+    text-align: center;
 }

@@ -11,8 +11,9 @@ from os import path
 import eel
 import sup
 
-pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('max_colwidth', 0)
 
 # 设置工作目录
 script_path = sys.path[0]
@@ -21,20 +22,16 @@ os.chdir(script_path)
 eel.init("ui")
 
 data = None
+data_path = None
 image = []
 
-def ret_val(success, data):
-	return json.dumps({
-		'success': success,
-		'data': str(data)
-	})
-
-# 实测通过
+# pass
 @eel.expose
 def get_cwd():
 	return os.getcwd()
 
-# 实测通过
+# pass
+# 查询目录子结构
 @eel.expose
 def open_path(p):
 	ret = []
@@ -45,32 +42,39 @@ def open_path(p):
 		})
 	return json.dumps(ret)
 
-# 实测通过
+# pass
+# 读文件，获取数据，用于预览
 @eel.expose
 def get_data(p):
 	global data
+	global data_path
+	data_path = p
 	with open(p, 'rb') as f:
-		reader = pd.read_csv(f, iterator=True)
-		chunks = []
-		for chunk in reader:
-			chunks.append(chunk)
-		data = pd.concat(chunks, ignore_index=True)
-		return ret_val(True, data)
+		data = pd.read_csv(f, ';')
+		return data.to_json()
+
+# pass
+# 输出处理过的数据，到输入文件所在目录下
+@eel.expose
+def save_data():
+	output_path = path.join(path.dirname(data_path), 'handled_' + path.basename(data_path))
+	data.to_csv(output_path)
+	return json.dumps({'output-path': output_path})
 
 @eel.expose
 def null_process(method):
 	sup.null_process(data, method)
-	return ret_val(True, data)
+	return data.to_json()
 
 @eel.expose
 def noise_process(method):
 	sup.noise_process(data, method)
-	return ret_val(True, data)
+	return data.to_json()
 
 @eel.expose
 def normalize(method):
 	sup.normalize(data, method)
-	return ret_val(True, data)
+	return data.to_json()
 
 @eel.expose
 def draw_line():
