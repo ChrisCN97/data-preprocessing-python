@@ -18,9 +18,9 @@ import sup
 from sup.util import bytes_to_b64, ResultType, result
 
 # 映射 method 参数为操作类型
-null_type = {0: '均值', 1: '均值-方差', 2: '正太随机'}
-noise_type = {0: '平均值', 1: '边界值', 3: '中值'}
-normalize_type = {0: 'min-max', 1: 'z-score', 2: '小数标定'}
+null_type = {'0': '均值', '1': '均值-方差', '2': '正太随机'}
+noise_type = {'0': '平均值', '1': '边界值', '3': '中值'}
+normalize_type = {'0': 'min-max', '1': 'z-score', '2': '小数标定'}
 
 class Context(object):
     max_rows = 500
