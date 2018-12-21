@@ -225,12 +225,18 @@ btn_reset.click(() => {
             eel.read_file(path)(wrapcall(
                 (data) => {
                     load_data(data)
+                    
+                    // 清空缩略视图
+                    $('#thumbnail-container').html('')
+
+                    // 这里不需要刷新属性筛选器
+
                     btn_reset.refreshing = false
-                    notify('success', '刷新成功')
+                    notify('success', '重置成功')
                 }
             ))
         }
-        else notify('warning', '请勿频繁刷新')
+        else notify('warning', '请勿频繁操作')
     }
     else notify('warning', '没有选择数据文件')
 })
@@ -335,26 +341,25 @@ const op_type = {
     normalize: {0: 'min-max', 1: 'z-score', 2: '小数标定'}
 }
 
-
 const call_eel = (name, method) => {
-    if (data_loaded) {
-        eel[name](method)(wrapcall(
-            (data) => {
-                load_data(data)
-                notify('success', name + ' (' + op_type[name][method] + ') 成功')
-            }
-        ))
-    }
-    else notify('danger', '无数据')
-}
-
-const call_eel_visual = (name) => {
     if (data_loaded) {
         if (enable_attr_filter) {
             let label = get_checked_attr()
-            eel[name](label)(wrapcall( (data, mid) => display_image(data, mid) ))
+            eel[name](method, label)(wrapcall(
+                (data) => {
+                    load_data(data)
+                    notify('success', name + ' (' + op_type[name][method] + ') 成功')
+                }
+            ))
         }
-        else notify('danger', '请启用属性筛选')
+        else {
+            eel[name](method)(wrapcall(
+                (data) => {
+                    load_data(data)
+                    notify('success', name + ' (' + op_type[name][method] + ') 成功')
+                }
+            ))
+        }
     }
     else notify('danger', '无数据')
 }
@@ -379,6 +384,17 @@ $('#normalize-calibrating').click(() => call_eel('normalize', 2))
 
 // 数据可视化
 
-$('#visual-bar').click( () => call_eel_visual('draw_bar') )
-$('#visual-line').click( () => call_eel_visual('draw_line') )
-$('#visual-pie').click( () => call_eel_visual('draw_pie') )
+const call_eel_visual = (method) => {
+    if (data_loaded) {
+        if (enable_attr_filter) {
+            let label = get_checked_attr()
+            eel.visualization(method, label)(wrapcall( (data, mid) => display_image(data, mid) ))
+        }
+        else notify('danger', '请启用属性筛选')
+    }
+    else notify('danger', '无数据')
+}
+
+$('#visual-bar').click( () => call_eel_visual(0) )
+$('#visual-line').click( () => call_eel_visual(1) )
+$('#visual-pie').click( () => call_eel_visual(2) )

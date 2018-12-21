@@ -1,7 +1,6 @@
 import pandas as pd
 
 '''
-# 接口2.3 normalize
 # 数据预处理函数（normalize），小数定标法辅助函数（find_tens）
 # made by 张晋豪, 2018.12.18
 '''
@@ -11,7 +10,10 @@ import pandas as pd
 # 0 min-max
 # 1 z-score
 # 2 小数定标
-def normalize(data, method):
+def normalize(data, method, label=None):
+    data_copy = data.copy()
+    if (label != None):
+        data = pd.DataFrame({label: data[label].values})
     l = data.columns.tolist()
     str_list = []
     number_list = []
@@ -58,6 +60,9 @@ def normalize(data, method):
             result = pd.concat([result, data_str[i]], axis=1)
         else:
             result = pd.concat([result, normal_df[i]], axis=1)
+    if (label != None):
+        data_copy[label]=result
+        return data_copy
     return result
 
 
@@ -67,3 +72,9 @@ def find_tens(Number):
     for i in range(-10, 11):
         if (number / (10 ** i) < 1):
             return i
+
+
+# if __name__ == '__main__':
+#     file = pd.read_table('bank.csv', ';')
+#     trainData = file.iloc[0:4000]
+#     print(normalize(trainData, 1, 'previous'))

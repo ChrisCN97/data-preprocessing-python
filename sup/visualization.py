@@ -72,9 +72,7 @@ def drawBar(label, data):
         plt.text(rect.get_x() + rect.get_width() / 2, height, str(height), ha='center', va='bottom')
     return fig.canvas
 
-# 对外接口
-
-def draw_bar(label, data):
+def draw_bar(data, label):
     '''
     label: string 属性列名
     data: list 属性列
@@ -86,7 +84,7 @@ def draw_bar(label, data):
         canvas = drawBar(label, data)
     return get_bytes(canvas)
 
-def draw_pie(label, data):
+def draw_pie(data, label):
     '''
     label: string 属性列名
     data: list 属性列
@@ -142,7 +140,7 @@ def draw_pie(label, data):
     plt.xlabel(label)
     return get_bytes(fig.canvas)
 
-def draw_line(label, data):
+def draw_line(data, label):
     '''
     label: string 属性列名
     data: list 属性列
@@ -154,3 +152,19 @@ def draw_line(label, data):
     x = range(len(data))
     ax1.plot(x, data)
     return get_bytes(fig.canvas)
+
+# 对外接口
+
+def visualization(data, method, label):
+    '''
+    data: 数据集
+    method: 0=直方图, 1=折线图, 2=饼图
+    label: 属性列名
+    '''
+    data = data[label]
+    if method is 0:
+        return draw_bar(data, label)
+    elif method is 1:
+        return draw_line(data, label)
+    else:
+        return draw_pie(data, label)

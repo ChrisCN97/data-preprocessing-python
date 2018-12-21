@@ -21,6 +21,7 @@ from sup.util import bytes_to_b64, ResultType, result
 null_type = {0: '均值', 1: '均值-方差', 2: '正态随机'}
 noise_type = {0: '平均值', 1: '边界值', 2: '中值'}
 normalize_type = {0: 'min-max', 1: 'z-score', 2: '小数标定'}
+visualization_type = {0: 'bar', 1: 'line', 2: 'pie'}
 
 class Context(object):
     max_rows = 500
@@ -200,7 +201,7 @@ class Context(object):
             msg = traceback.format_exc()
             return result(ResultType.failed, desc=msg)
 
-    def null_process(self, method):
+    def null_process(self, method, label):
         '''
         空值处理
         '''
@@ -212,61 +213,37 @@ class Context(object):
             msg = traceback.format_exc()
             return result(ResultType.failed, desc=msg)
         
-    def noise_process(self, method):
+    def noise_process(self, method, label):
         '''
         噪声处理
         '''
         try:
-            new_data = sup.noise_process(self.data, method)
+            new_data = sup.noise_process(self.data, method, label)
             self.__new_version(new_data, 'noise process (%s)' % noise_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
             msg = traceback.format_exc()
             return result(ResultType.failed, desc=msg)
         
-    def normalize(self, method):
+    def normalize(self, method, label):
         '''
         数据规范化
         '''
         try:
-            new_data = sup.normalize(self.data, method)
+            new_data = sup.normalize(self.data, method, label)
             self.__new_version(new_data, 'normalize (%s)' % noise_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
             msg = traceback.format_exc()
             return result(ResultType.failed, desc=msg)
     
-    def draw_line(self, label):
+    def visualization(self, method, label):
         '''
-        绘制折线图
-        '''
-        try:
-            data = sup.draw_line(label, self.data[label])
-            i = self.__add_image('line', label, data)
-            return result(ResultType.success, data=bytes_to_b64(data), ext=i)
-        except:
-            msg = traceback.format_exc()
-            return result(ResultType.failed, desc=msg)
-
-    def draw_bar(self, label):
-        '''
-        绘制直方图
+        可视化
         '''
         try:
-            data = sup.draw_bar(label, self.data[label])
-            i = self.__add_image('bar', label, data)
-            return result(ResultType.success, data=bytes_to_b64(data), ext=i)
-        except:
-            msg = traceback.format_exc()
-            return result(ResultType.failed, desc=msg)
-
-    def draw_pie(self, label):
-        '''
-        绘制饼图
-        '''
-        try:
-            data = sup.draw_pie(label, self.data[label])
-            i = self.__add_image('pie', label, data)
+            data = sup.visualization(self.data, method, label)
+            i = self.__add_image(visualization_type[method], label, data)
             return result(ResultType.success, data=bytes_to_b64(data), ext=i)
         except:
             msg = traceback.format_exc()

@@ -56,31 +56,20 @@ def save_data():
 	return ctx.save_data()
 
 @eel.expose
-def null_process(method):
-	return ctx.null_process(method)
+def null_process(method, label=None):
+	return ctx.null_process(method, label)
 
 @eel.expose
-def noise_process(method):
-	return ctx.noise_process(method)
+def noise_process(method, label=None):
+	return ctx.noise_process(method, label)
 
 @eel.expose
-def normalize(method):
-	return ctx.normalize(method)
+def normalize(method, label=None):
+	return ctx.normalize(method, label)
 
-# pass
 @eel.expose
-def draw_line(label):
-	return ctx.draw_line(label)
-
-# pass
-@eel.expose
-def draw_bar(label):
-	return ctx.draw_bar(label)
-
-# pass
-@eel.expose
-def draw_pie(label):
-	return ctx.draw_pie(label)
+def visualization(method, label):
+	return ctx.visualization(method, label)
 
 eel.init("ui")
 eel.start("index.html", options={

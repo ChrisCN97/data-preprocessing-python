@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 
 '''
-接口2.2 noise_process
 # 数据噪声处理（平均值去噪、边界值去噪、中值去噪）
 # made by 张晋豪, 2018.12.18
 '''
@@ -12,7 +11,10 @@ import numpy as np
 # 0：平均值
 # 1：边界值
 # 2：中值
-def noise_process(data, method):
+def noise_process(data, method, label=None):
+    data_copy = data.copy()
+    if (label != None):
+        data = pd.DataFrame({label: data[label].values})
     l = data.columns.tolist()
     str_list = []
     number_list = []
@@ -110,4 +112,9 @@ def noise_process(data, method):
             result = pd.concat([result, data_str[i]], axis=1)
         else:
             result = pd.concat([result, normal_df[i]], axis=1)
+    if (label != None):
+        data_copy[label] = result
+        return data_copy
     return result
+
+
