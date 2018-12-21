@@ -72,6 +72,32 @@ let ft_modal = $('#file-explorer')
 //     }
 // })
 
+/* 计算控制 */
+
+eel.get_ncpus()(wrapcall( (ncpus) => $('#cores-num-info').text(ncpus) ))
+
+$('#mpc-label').tooltip()
+let enable_mpc = false
+let btn_enable_mpc = $('#btn-enable-mpc')
+btn_enable_mpc.click(() => {
+    if (enable_mpc) {
+        eel.disable_mpc()(wrapcall(() => {
+            enable_mpc = false
+            $('#mpc-using-info').text('已禁用')
+            btn_enable_mpc.text('启用MPC')
+            btn_enable_mpc.removeClass('active')
+        } ))
+    }
+    else {
+        eel.enable_mpc()(wrapcall(() => {
+            enable_mpc = true
+            $('#mpc-using-info').text('已启用')
+            btn_enable_mpc.text('禁用MPC')
+            btn_enable_mpc.addClass('active')
+        }))
+    }
+})
+
 /* 文件浏览器 */
 
 let ft = new FileTree((path, resolve_view) =>

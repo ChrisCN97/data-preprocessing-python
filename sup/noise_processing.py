@@ -1,5 +1,5 @@
-import pandas as pd
-import numpy as np
+import pandas
+import numpy
 
 '''
 # 数据噪声处理（平均值去噪、边界值去噪、中值去噪）
@@ -14,7 +14,7 @@ import numpy as np
 def noise_process(data, method, label=None):
     data_copy = data.copy()
     if (label != None):
-        data = pd.DataFrame({label: data[label].values})
+        data = pandas.DataFrame({label: data[label].values})
     l = data.columns.tolist()
     str_list = []
     number_list = []
@@ -36,8 +36,8 @@ def noise_process(data, method, label=None):
 
     array_copy = array.copy()  # 获取输入dataframe的原始备份，用作中间计算处理
     array_copy2 = array.copy()  # 获取输入dataframe的原始备份，用作结果返回矩阵
-    array_rank = np.array(np.zeros(row * col)).reshape(row, col)  # 按列排序后到排序前的映射
-    array2rank = np.array(np.zeros(row * col)).reshape(row, col)  # 按列排序前到排序后的映射
+    array_rank = numpy.array(numpy.zeros(row * col)).reshape(row, col)  # 按列排序后到排序前的映射
+    array2rank = numpy.array(numpy.zeros(row * col)).reshape(row, col)  # 按列排序前到排序后的映射
     for i in range(col):
         array_rank[:] = array_copy.argsort(0)  # 排序后的数组该位置对应原始数组的位置
         array.sort(0)  # 按列排序
@@ -70,7 +70,7 @@ def noise_process(data, method, label=None):
             end = int((k + 1) / 10.0 * row)  # 单位终点
             List = array_rank[start:end].astype(int)  # 将这一区间内的排序结果转换为int类型
             for j in range(col):
-                mean = np.sum(array_copy[List, j]) / (1 / 10.0 * row)  # 计算区间均值
+                mean = numpy.sum(array_copy[List, j]) / (1 / 10.0 * row)  # 计算区间均值
                 array_copy2[int(array_rank[i, j]), j] = mean  # 原始矩阵的备份[排序前对应排序位置]=均值
             count += 1
             if (count % (row / 10) == 0):
@@ -103,15 +103,15 @@ def noise_process(data, method, label=None):
             if (count % (row / 10) == 0):
                 k += 1
 
-    # array_copy2 = pd.merge(array_copy2, data_str)
-    normal_df = pd.DataFrame(array_copy2, index=range(row), columns=list)
-    # normal_df = pd.concat([normal_df, data_str], axis=1)
-    result = pd.DataFrame()
+    # array_copy2 = pandas.merge(array_copy2, data_str)
+    normal_df = pandas.DataFrame(array_copy2, index=range(row), columns=list)
+    # normal_df = pandas.concat([normal_df, data_str], axis=1)
+    result = pandas.DataFrame()
     for i in l:
         if (i in str_list):
-            result = pd.concat([result, data_str[i]], axis=1)
+            result = pandas.concat([result, data_str[i]], axis=1)
         else:
-            result = pd.concat([result, normal_df[i]], axis=1)
+            result = pandas.concat([result, normal_df[i]], axis=1)
     if (label != None):
         data_copy[label] = result
         return data_copy

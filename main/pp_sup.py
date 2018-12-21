@@ -17,10 +17,17 @@ class MPCompute(object):
                 list equal to callbackargs+(result,)
                 as soon as calculation is done
         callbackargs - additional arguments for callback function
+        return - job
         '''
-        self.job_server.submit(func, args, depfuncs, modules, callback, callbackargs)
+        return self.job_server.submit(func, args, depfuncs, modules, callback, callbackargs)
+
+    def print_stats(self):
+        self.job_server.print_stats()
     
     def get_stats(self):
+        '''
+        return - pp.Statistics (ncpus, njobs, rworker, time)
+        '''
         return self.job_server.get_stats()
     
     def shutdown(self):

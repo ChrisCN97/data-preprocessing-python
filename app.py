@@ -4,14 +4,16 @@ author: 李经纬
 
 import os
 import sys
-import eel
-from main.context import Context
 
 # 设置工作目录
 script_path = sys.path[0]
 os.chdir(script_path)
 
+from main.context import Context
+
 ctx = Context()
+
+import eel
 
 @eel.expose
 def enable_mpc():

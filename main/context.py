@@ -29,7 +29,11 @@ class Context(object):
         self.__reset()
         self.data = None
         self.data_path = None
-        self.mpc = None # MPCompute()
+        self.mpc = MPCompute()
+        self.__enable_mpc = False
+
+    def __del__(self):
+        self.mpc.shutdown()
 
     def __reset(self):
         self.images = {}
@@ -86,33 +90,22 @@ class Context(object):
         '''
         启用mpc
         '''
-        try:
-            self.mpc = MPCompute()
-            return result(ResultType.success)
-        except:
-            msg = traceback.format_exc()
-            return result(ResultType.failed, desc=msg)
+        # 始终禁用
+        # self.__enable_mpc = True
+        return result(ResultType.success)
     
     def get_ncpus(self):
         '''
         获取可用核数
         '''
-        if self.mpc:
-            return result(ResultType.success, data=self.mpc.ncpus)
-        else:
-            return result(ResultType.failed, desc='multiple cores compute is disable')
+        return result(ResultType.success, data=self.mpc.ncpus)
 
     def disable_mpc(self):
         '''
         禁用mpc
         '''
-        try:
-            self.mpc.shutdown()
-            self.mpc = None
-            return result(ResultType.success)
-        except:
-            msg = traceback.format_exc()
-            return result(ResultType.failed, desc=msg)
+        self.__enable_mpc = False
+        return result(ResultType.success)
             
     def get_cwd(self):
         '''
@@ -218,7 +211,10 @@ class Context(object):
         噪声处理
         '''
         try:
-            new_data = sup.noise_process(self.data, method, label)
+            if self.__enable_mpc:
+                new_data = self.mpc.compute(sup.noise_process, args=(self.data, method, label), depfuncs=(), modules=('pandas', 'numpy'), callback=())()
+            else:
+                new_data = sup.noise_process(self.data, method, label)
             self.__new_version(new_data, 'noise process (%s)' % noise_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
