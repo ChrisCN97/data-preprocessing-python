@@ -36,7 +36,7 @@
     background-image: url('../img/save.png');
 }
 
-#btn-refresh {
+#btn-reset {
     right: -30px; top: 40px;
     border: 1px solid rgb(200, 200, 200);
     border-radius: 0px 5px 5px 0px;
@@ -44,7 +44,7 @@
     box-shadow: none;
 }
 
-#btn-refresh .backimg {
+#btn-reset .backimg {
     display: block;
     position: absolute;
     left: 0px; top: 0px;

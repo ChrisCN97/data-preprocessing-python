@@ -12,10 +12,24 @@ import pandas as pd
 # 1 z-score
 # 2 小数定标
 def normalize(data, method):
-    row = data.shape[0]  # 行
-    col = data.shape[1]  # 列
-    list = data.columns.values.tolist()  # 属性列表
-    array = data.values  # numpy数组
+    l = data.columns.tolist()
+    str_list = []
+    number_list = []
+    for i in l:
+        if (isinstance(data.iloc[1][i], str) == True):
+            str_list.append(i)
+        else:
+            number_list.append(i)
+    # print("str_list " + str(str_list))
+    # print("number_list " + str(number_list))
+
+    data_str = data[str_list]
+    data_number = data[number_list]
+
+    row = data_number.shape[0]  # 行
+    col = data_number.shape[1]  # 列
+    list = data_number.columns.values.tolist()  # 属性列表
+    array = data_number.astype(float).values  # numpy数组
 
     if method == 0:  # min-max
         for i in range(col):
@@ -37,7 +51,14 @@ def normalize(data, method):
             array[:, i] = array[:, i] / ten_up
 
     normal_df = pd.DataFrame(array, index=range(row), columns=list)
-    return normal_df
+    # normal_df = pd.concat([normal_df, data_str], axis=1)
+    result = pd.DataFrame()
+    for i in l:
+        if (i in str_list):
+            result = pd.concat([result, data_str[i]], axis=1)
+        else:
+            result = pd.concat([result, normal_df[i]], axis=1)
+    return result
 
 
 # 需要一个10的x次方，使其刚好大于Number值，返回x
@@ -46,9 +67,3 @@ def find_tens(Number):
     for i in range(-10, 11):
         if (number / (10 ** i) < 1):
             return i
-
-# if __name__ == '__main__':
-#     file = pd.read_table('bank.csv', ';')
-#     trainData = file.iloc[0:4000][
-#         ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
-#     print(normalize(trainData, 2))

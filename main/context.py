@@ -18,9 +18,9 @@ import sup
 from sup.util import bytes_to_b64, ResultType, result
 
 # 映射 method 参数为操作类型
-null_type = {'0': '均值', '1': '均值-方差', '2': '正太随机'}
-noise_type = {'0': '平均值', '1': '边界值', '3': '中值'}
-normalize_type = {'0': 'min-max', '1': 'z-score', '2': '小数标定'}
+null_type = {0: '均值', 1: '均值-方差', 2: '正态随机'}
+noise_type = {0: '平均值', 1: '边界值', 2: '中值'}
+normalize_type = {0: 'min-max', 1: 'z-score', 2: '小数标定'}
 
 class Context(object):
     max_rows = 500
@@ -65,7 +65,7 @@ class Context(object):
         # data: 图像 bytes 数据
         # return: image ID，格式: data_version.image_count.label.bar，实例: 1.3.age.line
         '''
-        i = '%d.%d.%s.%s' % (self.data_version, self.image_count, label, type)
+        i = '%d-%d-%s-%s' % (self.data_version, self.image_count, label, type)
         self.image_count += 1
         self.images[i] = data
         return i
@@ -179,24 +179,26 @@ class Context(object):
         '''
         在输入目录下创建 DPTool-output，存储数据到该目录下
         '''
-        output_dir = path.join(path.dirname(self.data_path), 'DPTool-output')
-        if path.exists(output_dir):
-            shutil.rmtree(output_dir)
-        os.mkdir(output_dir)
-        # 存储处理后的数据
-        output_path = path.join(output_dir, str(self.data_version) + '.' + path.basename(self.data_path))
-        self.data.to_csv(output_path)
-        # 存储视图
-        for name in self.images:
-            with open(path.join(output_dir, name + '.png'), 'wb') as f:
-                f.write(self.images[name])
-        # 存储操作日志
-        with open(path.join(output_dir, 'op.records'), 'wb') as f:
-            for item in self.op_records:
-                f.write(item)
-                f.write('\n')
-        # return
-        return result(ResultType.success, data=output_dir)
+        try:
+            output_dir = path.join(path.dirname(self.data_path), 'DPTool-output')
+            if path.exists(output_dir):
+                shutil.rmtree(output_dir)
+            os.mkdir(output_dir)
+            # 存储处理后的数据
+            output_path = path.join(output_dir, str(self.data_version) + '-' + path.basename(self.data_path))
+            self.data.to_csv(output_path)
+            # 存储视图
+            for name in self.images:
+                with open(path.join(output_dir, name + '.png'), 'wb') as f:
+                    f.write(self.images[name])
+            # 存储操作日志
+            with open(path.join(output_dir, 'op-records.txt'), 'wb') as f:
+                for item in self.op_records:
+                    f.write((item + '\n').encode('utf-8'))
+            return result(ResultType.success, data=output_dir)
+        except:
+            msg = traceback.format_exc()
+            return result(ResultType.failed, desc=msg)
 
     def null_process(self, method):
         '''
@@ -204,7 +206,7 @@ class Context(object):
         '''
         try:
             new_data = sup.null_process(self.data, method)
-            self.__new_version(new_data, 'null process - ' + null_type[method])
+            self.__new_version(new_data, 'null process (%s)' % noise_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
             msg = traceback.format_exc()
@@ -216,7 +218,7 @@ class Context(object):
         '''
         try:
             new_data = sup.noise_process(self.data, method)
-            self.__new_version(new_data, 'noise process - ' + noise_type[method])
+            self.__new_version(new_data, 'noise process (%s)' % noise_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
             msg = traceback.format_exc()
@@ -228,7 +230,7 @@ class Context(object):
         '''
         try:
             new_data = sup.normalize(self.data, method)
-            self.__new_version(new_data, 'normalize - ' + normalize_type[method])
+            self.__new_version(new_data, 'normalize (%s)' % noise_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
             msg = traceback.format_exc()

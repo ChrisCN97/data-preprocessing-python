@@ -94,9 +94,17 @@ $('#btn-ft-confirm').click(() => {
             eel.read_file(path)(wrapcall(
                 (data) => {
                     main_input_path.text(path)
-                    data_loaded = true
-                    ft_modal.modal('toggle')
+                    
+                    // 清空缩略视图
+                    $('#thumbnail-container').html('')
+
                     load_data(data)
+                    
+                    // 设置属性筛选器
+                    display_attrs()
+                    data_loaded = true
+                    
+                    ft_modal.modal('toggle')
                     notify('success', '数据加载成功')
                 }
             ))
@@ -196,13 +204,8 @@ const load_data = (json_data) => {
         data = JSON.parse(base.data)
         let col_keys, row_keys
         const at = (c, r) => data[col_keys[c]][row_keys[r]]
-        
-        // 清空缩略视图
-        $('#thumbnail-container').html('')
 
-        // 设置属性筛选器
         attrs = col_keys = Object.keys(data)
-        display_attrs()
 
         if (col_keys.length) {
             row_keys = Object.keys(data[col_keys[0]])
@@ -212,17 +215,17 @@ const load_data = (json_data) => {
     }
 }
 
-let btn_refresh = $('#btn-refresh')
-btn_refresh.tooltip()
-btn_refresh.click(() => {
+let btn_reset = $('#btn-reset')
+btn_reset.tooltip()
+btn_reset.click(() => {
     let path = main_input_path.text()
     if (path) {
-        if (!btn_refresh.refreshing) {
-            btn_refresh.refreshing = true
+        if (!btn_reset.refreshing) {
+            btn_reset.refreshing = true
             eel.read_file(path)(wrapcall(
                 (data) => {
                     load_data(data)
-                    btn_refresh.refreshing = false
+                    btn_reset.refreshing = false
                     notify('success', '刷新成功')
                 }
             ))
@@ -326,12 +329,19 @@ $('#btn-save').click(() => {
     ))
 })
 
+const op_type = {
+    null_process: {0: '均值', 1: '均值-方差', 2: '正态随机'},
+    noise_process: {0: '平均值', 1: '边界值', 2: '中值'},
+    normalize: {0: 'min-max', 1: 'z-score', 2: '小数标定'}
+}
+
+
 const call_eel = (name, method) => {
     if (data_loaded) {
         eel[name](method)(wrapcall(
             (data) => {
                 load_data(data)
-                notify('success', name + ' 成功')
+                notify('success', name + ' (' + op_type[name][method] + ') 成功')
             }
         ))
     }

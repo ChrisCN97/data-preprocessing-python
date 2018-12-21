@@ -13,10 +13,24 @@ import numpy as np
 # 1：边界值
 # 2：中值
 def noise_process(data, method):
+    l = data.columns.tolist()
+    str_list = []
+    number_list = []
+    for i in l:
+        if (isinstance(data.iloc[1][i], str) == True):
+            str_list.append(i)
+        else:
+            number_list.append(i)
+    # print("str_list " + str(str_list))
+    # print("number_list " + str(number_list))
+
+    data_str = data[str_list]
+    data = data[number_list]
+
     row = data.shape[0]  # 行
     col = data.shape[1]  # 列
     list = data.columns.values.tolist()  # 属性列表
-    array = np.array(data.values)  # numpy数组
+    array = data.astype(float).values  # numpy数组
 
     array_copy = array.copy()  # 获取输入dataframe的原始备份，用作中间计算处理
     array_copy2 = array.copy()  # 获取输入dataframe的原始备份，用作结果返回矩阵
@@ -69,7 +83,7 @@ def noise_process(data, method):
             end = int((k + 1) / 10.0 * row) - 1  # 单位终点
             for j in range(col):  # 对每一列
                 up = array_copy2[end, j]  # 取排序后的上限
-                array_copy2[int(array_rank[i, j]), j] = up  # 去区间上限降噪
+                array_copy2[int(array_rank[i, j]), j] = up  # 取区间上限降噪
             count += 1
             if (count % (row / 10) == 0):
                 k += 1
@@ -87,13 +101,13 @@ def noise_process(data, method):
             if (count % (row / 10) == 0):
                 k += 1
 
+    # array_copy2 = pd.merge(array_copy2, data_str)
     normal_df = pd.DataFrame(array_copy2, index=range(row), columns=list)
-    return normal_df
-
-
-# if __name__ == '__main__':
-#     file = pd.read_table('bank.csv', ';')
-#     trainData = file.iloc[0:4000][
-#         ['balance', 'age', 'day', 'duration', 'campaign', 'previous', 'pdays']].astype('float')
-#     df = noise_process(trainData, 2)
-#     print(df)
+    # normal_df = pd.concat([normal_df, data_str], axis=1)
+    result = pd.DataFrame()
+    for i in l:
+        if (i in str_list):
+            result = pd.concat([result, data_str[i]], axis=1)
+        else:
+            result = pd.concat([result, normal_df[i]], axis=1)
+    return result
