@@ -91,9 +91,9 @@ $('#btn-ft-confirm').click(() => {
     let path = ft_input_path.text()
     if (path) {
         if (path != main_input_path.text()) {
-            main_input_path.text(path)
             eel.read_file(path)(wrapcall(
                 (data) => {
+                    main_input_path.text(path)
                     data_loaded = true
                     ft_modal.modal('toggle')
                     load_data(data)
@@ -118,7 +118,7 @@ const display_attrs = () => {
         row.append(`
         <div class="col-xs-3 col-sm-3">
             <label class="radio-inline">
-                <input type="radio" name="radio"  value="` + i + `">` + attr + `
+                <input type="radio" name="radio" value="` + i + `">` + attr + `
             </label>
         </div>`)
         row_sz++
