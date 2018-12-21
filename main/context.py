@@ -25,13 +25,16 @@ normalize_type = {0: 'min-max', 1: 'z-score', 2: '小数标定'}
 class Context(object):
     max_rows = 500
     def __init__(self):
-        self.data = pd.DataFrame()
+        self.__reset()
+        self.data = None
         self.data_path = None
+        self.mpc = None # MPCompute()
+
+    def __reset(self):
         self.images = {}
         self.op_records = []
         self.data_version = 0
         self.image_count = 0
-        self.mpc = None # MPCompute()
 
     def __new_version(self, data, op_type):
         '''
@@ -56,13 +59,13 @@ class Context(object):
                 ret['data'] = self.data.to_json()
         return json.dumps(ret)
 
-    def __add_image(self, type, data):
+    def __add_image(self, type, label, data):
         '''
         # type: 图像内容——直方图、折线图、饼图
         # data: 图像 bytes 数据
-        # return: image ID，格式: data_version.image_count.bar，实例: 1.3.line
+        # return: image ID，格式: data_version.image_count.label.bar，实例: 1.3.age.line
         '''
-        i = str(self.data_version) + '.' + str(self.image_count) + '.' + type
+        i = '%d.%d.%s.%s' % (self.data_version, self.image_count, label, type)
         self.image_count += 1
         self.images[i] = data
         return i
@@ -149,10 +152,11 @@ class Context(object):
                         self.data = pd.read_csv(f, ';')
                     else:
                         self.data = getattr(pd, 'read_' + file_type)(f)
+                    self.__reset()
+                    return result(ResultType.success, data=self.__get_data())
                 except:
                     msg = traceback.format_exc()
                     return result(ResultType.failed, desc=msg)
-                return result(ResultType.success, data=self.__get_data())
             else:
                 return result(ResultType.failed, desc='unsupported file type: ' + file_type)
         return result(ResultType.failed, desc='cannot open file: ' + p)
@@ -236,7 +240,7 @@ class Context(object):
         '''
         try:
             data = sup.draw_line(label, self.data[label])
-            i = self.__add_image('line', data)
+            i = self.__add_image('line', label, data)
             return result(ResultType.success, data=bytes_to_b64(data), ext=i)
         except:
             msg = traceback.format_exc()
@@ -248,7 +252,7 @@ class Context(object):
         '''
         try:
             data = sup.draw_bar(label, self.data[label])
-            i = self.__add_image('bar', data)
+            i = self.__add_image('bar', label, data)
             return result(ResultType.success, data=bytes_to_b64(data), ext=i)
         except:
             msg = traceback.format_exc()
@@ -260,7 +264,7 @@ class Context(object):
         '''
         try:
             data = sup.draw_pie(label, self.data[label])
-            i = self.__add_image('pie', data)
+            i = self.__add_image('pie', label, data)
             return result(ResultType.success, data=bytes_to_b64(data), ext=i)
         except:
             msg = traceback.format_exc()

@@ -86,19 +86,22 @@ eel.get_cwd()(wrapcall(
 // 后退按钮，读取父目录
 $('#btn-ft-backup').click(() => ft.load_parent())
 
-// 选择文件按钮，绑定 click 事件
+// 选择文件按钮，绑定 click 事件，负责加载数据以及重置视图
 $('#btn-ft-confirm').click(() => {
     let path = ft_input_path.text()
     if (path) {
-        main_input_path.text(path)
-        ft_modal.modal('toggle')
-        eel.read_file(path)(wrapcall(
-            (data) => {
-                load_data(data)
-                data_loaded = true
-                notify('success', '数据加载成功')
-            }
-        ))
+        if (path != main_input_path.text()) {
+            main_input_path.text(path)
+            eel.read_file(path)(wrapcall(
+                (data) => {
+                    data_loaded = true
+                    ft_modal.modal('toggle')
+                    load_data(data)
+                    notify('success', '数据加载成功')
+                }
+            ))
+        }
+        else notify('warning', '数据已加载')
     }
     else notify('warning', '请选择一个数据文件')
 })
@@ -194,6 +197,10 @@ const load_data = (json_data) => {
         let col_keys, row_keys
         const at = (c, r) => data[col_keys[c]][row_keys[r]]
         
+        // 清空缩略视图
+        $('#thumbnail-container').html('')
+
+        // 设置属性筛选器
         attrs = col_keys = Object.keys(data)
         display_attrs()
 
