@@ -128,15 +128,33 @@ class Context(object):
             })
         return result(ResultType.success, data=data)
 
+    '''
+    html格式输出再输入内容又增加！也就是说html输出的数据不能读入后直接使用
+    '''
+    sup_file_type = ['csv', 'json', 'html'] # excel feather, gbq, hdf, msgpack, parquet, pickle, sql, stata
+
     def read_file(self, p):
         '''
         读文件，获取数据，用于预览
-        支持的数据文件类型：csv, excel, feather, fwf, gbq, hdf, html, json, msgpack, parquet, pickle, sas, sql, sql_query, sql_table, stata, table
+        支持的数据文件类型：sup_file_type
         '''
+        name = path.basename(p)
+        i = name.rfind('.')
+        file_type = name[i + 1:].lower() if i >= 0 else None
         self.data_path = p
         with open(p, 'rb') as f:
-            self.data = pd.read_csv(f, ';')
-            return result(ResultType.success, data=self.__get_data())
+            if file_type and file_type in Context.sup_file_type:
+                try:
+                    if file_type == 'csv':
+                        self.data = pd.read_csv(f, ';')
+                    else:
+                        self.data = getattr(pd, 'read_' + file_type)(f)
+                except:
+                    msg = traceback.format_exc()
+                    return result(ResultType.failed, desc=msg)
+                return result(ResultType.success, data=self.__get_data())
+            else:
+                return result(ResultType.failed, desc='unsupported file type: ' + file_type)
         return result(ResultType.failed, desc='cannot open file: ' + p)
 
     def get_data(self):
