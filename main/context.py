@@ -33,13 +33,15 @@ class Context(object):
         self.image_count = 0
         self.mpc = None # MPCompute()
 
-    def __new_version(self, op_type):
+    def __new_version(self, data, op_type):
         '''
+        data: 新版本数据
         op_type: 操作类型，代表本次更新数据使用的操作
         数据更新后 data_version 自增
         '''
-        self.op_records.append(op_type)
+        self.data = data
         self.data_version += 1
+        self.op_records.append(op_type)
 	
     def __get_data(self):
         '''
@@ -129,6 +131,7 @@ class Context(object):
     def read_file(self, p):
         '''
         读文件，获取数据，用于预览
+        支持的数据文件类型：csv, excel, feather, fwf, gbq, hdf, html, json, msgpack, parquet, pickle, sas, sql, sql_query, sql_table, stata, table
         '''
         self.data_path = p
         with open(p, 'rb') as f:
@@ -178,8 +181,8 @@ class Context(object):
         空值处理
         '''
         try:
-            sup.null_process(self.data, method)
-            self.__new_version('null process - ' + null_type[method])
+            new_data = sup.null_process(self.data, method)
+            self.__new_version(new_data, 'null process - ' + null_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
             msg = traceback.format_exc()
@@ -190,8 +193,8 @@ class Context(object):
         噪声处理
         '''
         try:
-            sup.noise_process(self.data, method)
-            self.__new_version('noise process - ' + noise_type[method])
+            new_data = sup.noise_process(self.data, method)
+            self.__new_version(new_data, 'noise process - ' + noise_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
             msg = traceback.format_exc()
@@ -202,8 +205,8 @@ class Context(object):
         数据规范化
         '''
         try:
-            sup.normalize(self.data, method)
-            self.__new_version('normalize - ' + normalize_type[method])
+            new_data = sup.normalize(self.data, method)
+            self.__new_version(new_data, 'normalize - ' + normalize_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
             msg = traceback.format_exc()
