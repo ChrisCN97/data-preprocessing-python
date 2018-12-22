@@ -5,7 +5,6 @@ class MPCompute(object):
     def __init__(self):
         self.job_server = pp.Server()
         self.ncpus = self.job_server.get_ncpus()
-        self.jobs = []
 
     def compute(self, func, args=(), depfuncs=(), modules=(), callback=None, callbackargs=()):
         '''
