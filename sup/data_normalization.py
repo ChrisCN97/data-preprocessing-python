@@ -1,5 +1,3 @@
-import pandas as pd
-
 '''
 # 数据预处理函数（normalize），小数定标法辅助函数（find_tens）
 # made by 张晋豪, 2018.12.18
@@ -11,9 +9,11 @@ import pandas as pd
 # 1 z-score
 # 2 小数定标
 def normalize(data, method, label=None):
+    import pandas
+    
     data_copy = data.copy()
     if (label != None):
-        data = pd.DataFrame({label: data[label].values})
+        data = pandas.DataFrame({label: data[label].values})
     l = data.columns.tolist()
     str_list = []
     number_list = []
@@ -52,14 +52,14 @@ def normalize(data, method, label=None):
             ten_up = 10 ** tens
             array[:, i] = array[:, i] / ten_up
 
-    normal_df = pd.DataFrame(array, index=range(row), columns=list)
-    # normal_df = pd.concat([normal_df, data_str], axis=1)
-    result = pd.DataFrame()
+    normal_df = pandas.DataFrame(array, index=range(row), columns=list)
+    # normal_df = pandas.concat([normal_df, data_str], axis=1)
+    result = pandas.DataFrame()
     for i in l:
         if (i in str_list):
-            result = pd.concat([result, data_str[i]], axis=1)
+            result = pandas.concat([result, data_str[i]], axis=1)
         else:
-            result = pd.concat([result, normal_df[i]], axis=1)
+            result = pandas.concat([result, normal_df[i]], axis=1)
     if (label != None):
         data_copy[label]=result
         return data_copy
@@ -75,6 +75,6 @@ def find_tens(Number):
 
 
 # if __name__ == '__main__':
-#     file = pd.read_table('bank.csv', ';')
+#     file = pandas.read_table('bank.csv', ';')
 #     trainData = file.iloc[0:4000]
 #     print(normalize(trainData, 1, 'previous'))

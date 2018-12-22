@@ -23,17 +23,31 @@ noise_type = {0: '平均值', 1: '边界值', 2: '中值'}
 normalize_type = {0: 'min-max', 1: 'z-score', 2: '小数标定'}
 visualization_type = {0: 'bar', 1: 'line', 2: 'pie'}
 
+
+def wrap_catch(func):
+    def wrapper(obj, method, label):
+        try:
+            return func(obj, method, label)
+        except ValueError:
+            return result(ResultType.failed, desc='数据不合法，无法进行操作')
+        except:
+            msg = traceback.format_exc()
+            return result(ResultType.failed, desc=msg)
+    return wrapper
+
 class Context(object):
     max_rows = 500
     def __init__(self):
         self.__reset()
         self.data = None
         self.data_path = None
-        self.mpc = MPCompute()
+        self.mpc = None
         self.__enable_mpc = False
 
     def __del__(self):
-        self.mpc.shutdown()
+        if not self.mpc is None:
+            self.mpc.shutdown()
+            self.mpc = None
 
     def __reset(self):
         self.images = {}
@@ -91,20 +105,31 @@ class Context(object):
         启用mpc
         '''
         # 始终禁用
-        # self.__enable_mpc = True
-        return result(ResultType.success)
+        try:
+            self.__enable_mpc = True
+            if self.mpc is None:
+                self.mpc = MPCompute()
+            return result(ResultType.success)
+        except:
+            msg = traceback.format_exc()
+            return result(ResultType.failed, desc=msg)
     
     def get_ncpus(self):
         '''
         获取可用核数
         '''
-        return result(ResultType.success, data=self.mpc.ncpus)
+        if self.mpc != None:
+            return result(ResultType.success, data=self.mpc.ncpus)
+        return result(ResultType.failed, desc='MPC invaliable')
 
     def disable_mpc(self):
         '''
         禁用mpc
         '''
         self.__enable_mpc = False
+        if not self.mpc is None:
+            self.mpc.shutdown()
+            self.mpc = None
         return result(ResultType.success)
             
     def get_cwd(self):
@@ -194,53 +219,47 @@ class Context(object):
             msg = traceback.format_exc()
             return result(ResultType.failed, desc=msg)
 
+    @wrap_catch
     def null_process(self, method, label):
         '''
         空值处理
         '''
-        try:
+        if self.__enable_mpc:
+            new_data = self.mpc.compute(sup.null_process, args=(self.data, method, label))()
+        else:
             new_data = sup.null_process(self.data, method, label)
-            self.__new_version(new_data, 'null process (%s)' % noise_type[method])
-            return result(ResultType.success, data=self.__get_data())
-        except:
-            msg = traceback.format_exc()
-            return result(ResultType.failed, desc=msg)
+        self.__new_version(new_data, 'null process (%s)' % noise_type[method])
+        return result(ResultType.success, data=self.__get_data())
         
+    @wrap_catch
     def noise_process(self, method, label):
         '''
         噪声处理
         '''
-        try:
-            if self.__enable_mpc:
-                new_data = self.mpc.compute(sup.noise_process, args=(self.data, method, label), depfuncs=(), modules=('pandas', 'numpy'), callback=())()
-            else:
-                new_data = sup.noise_process(self.data, method, label)
-            self.__new_version(new_data, 'noise process (%s)' % noise_type[method])
-            return result(ResultType.success, data=self.__get_data())
-        except:
-            msg = traceback.format_exc()
-            return result(ResultType.failed, desc=msg)
+        if self.__enable_mpc:
+            new_data = self.mpc.compute(sup.noise_process, args=(self.data, method, label))()
+        else:
+            new_data = sup.noise_process(self.data, method, label)
+        self.__new_version(new_data, 'noise process (%s)' % noise_type[method])
+        return result(ResultType.success, data=self.__get_data())
         
+    @wrap_catch
     def normalize(self, method, label):
         '''
         数据规范化
         '''
-        try:
+        if self.__enable_mpc:
+            new_data = self.mpc.compute(sup.normalize, args=(self.data, method, label))()
+        else:
             new_data = sup.normalize(self.data, method, label)
-            self.__new_version(new_data, 'normalize (%s)' % noise_type[method])
-            return result(ResultType.success, data=self.__get_data())
-        except:
-            msg = traceback.format_exc()
-            return result(ResultType.failed, desc=msg)
+        self.__new_version(new_data, 'normalize (%s)' % noise_type[method])
+        return result(ResultType.success, data=self.__get_data())
     
+    @wrap_catch
     def visualization(self, method, label):
         '''
         可视化
         '''
-        try:
-            data = sup.visualization(self.data, method, label)
-            i = self.__add_image(visualization_type[method], label, data)
-            return result(ResultType.success, data=bytes_to_b64(data), ext=i)
-        except:
-            msg = traceback.format_exc()
-            return result(ResultType.failed, desc=msg)
+        data = sup.visualization(self.data, method, label)
+        i = self.__add_image(visualization_type[method], label, data)
+        return result(ResultType.success, data=bytes_to_b64(data), ext=i)

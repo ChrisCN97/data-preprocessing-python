@@ -1,8 +1,8 @@
-import eel
+# import eel
 
 def test():
-    import subprocess
-    proc = subprocess.Popen('cmd.exe', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    import subprocess as sps
+    proc = sps.Popen('cmd.exe', stdin=sps.PIPE, stdout=sps.PIPE, stderr=sps.PIPE)
     print(proc.stdin)
     proc.kill()
 

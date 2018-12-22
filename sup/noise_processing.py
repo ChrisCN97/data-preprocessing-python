@@ -1,5 +1,3 @@
-import pandas
-import numpy
 
 '''
 # 数据噪声处理（平均值去噪、边界值去噪、中值去噪）
@@ -12,6 +10,9 @@ import numpy
 # 1：边界值
 # 2：中值
 def noise_process(data, method, label=None):
+    import pandas
+    import numpy
+    
     data_copy = data.copy()
     if (label != None):
         data = pandas.DataFrame({label: data[label].values})
