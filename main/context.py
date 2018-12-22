@@ -29,7 +29,7 @@ class Context(object):
         self.__reset()
         self.data = None
         self.data_path = None
-        self.mpc = None # MPCompute()
+        self.mpc = MPCompute()
         self.__enable_mpc = False
 
     def __del__(self):
