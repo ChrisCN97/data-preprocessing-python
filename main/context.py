@@ -29,7 +29,7 @@ class Context(object):
         self.__reset()
         self.data = None
         self.data_path = None
-        self.mpc = MPCompute()
+        self.mpc = None # MPCompute()
         self.__enable_mpc = False
 
     def __del__(self):
@@ -199,7 +199,7 @@ class Context(object):
         空值处理
         '''
         try:
-            new_data = sup.null_process(self.data, method)
+            new_data = sup.null_process(self.data, method, label)
             self.__new_version(new_data, 'null process (%s)' % noise_type[method])
             return result(ResultType.success, data=self.__get_data())
         except:
